@@ -15,6 +15,7 @@ import by.lexshi.catsapi.network.RestClient
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.*
 
+@DelicateCoroutinesApi
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -23,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var back_anim: AnimatorSet
     var isFront = true
 
-    @DelicateCoroutinesApi
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -51,7 +52,6 @@ class MainActivity : AppCompatActivity() {
 
 
     @SuppressLint("NotifyDataSetChanged")
-    @DelicateCoroutinesApi
     fun updateView() {
         job = GlobalScope.launch(Dispatchers.IO) {
             val response = RestClient().service.getDataFromAPI()
@@ -103,7 +103,7 @@ class MainActivity : AppCompatActivity() {
             binding.cardView.visibility = View.VISIBLE
             isFront = true
             binding.rvList.visibility = View.VISIBLE
-            val handler = Handler()
+            
             handler.postDelayed({
                 binding.cardView.visibility = View.GONE
             }, 1000)
