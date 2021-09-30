@@ -53,6 +53,14 @@
                 android:padding="8dp"
                 tools:text="TEXT THIS" />
 
+            <ImageView
+                android:id="@+id/save_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="8dp"
+                android:src="@drawable/ic_baseline_save_100" />
+
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

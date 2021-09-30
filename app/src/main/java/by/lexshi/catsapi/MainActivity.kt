@@ -3,17 +3,33 @@ package by.lexshi.catsapi
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.annotation.SuppressLint
+import android.content.ContentValues
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
+import android.provider.MediaStore
 import android.view.View
+import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.lexshi.catsapi.databinding.ActivityMainBinding
 import by.lexshi.catsapi.network.RestClient
+import by.lexshi.catsapi.util.saveMediaToStorage
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.*
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
 
 @DelicateCoroutinesApi
 class MainActivity : AppCompatActivity() {
@@ -41,14 +57,26 @@ class MainActivity : AppCompatActivity() {
         binding.rvList.cameraDistance = 8000 * scale
         binding.cardView.cameraDistance = 8000 * scale
 
-        front_anim = AnimatorInflater.loadAnimator(applicationContext, R.animator.front_animator) as AnimatorSet
-        back_anim = AnimatorInflater.loadAnimator(applicationContext, R.animator.back_animator) as AnimatorSet
+        front_anim = AnimatorInflater.loadAnimator(
+            applicationContext,
+            R.animator.front_animator
+        ) as AnimatorSet
+        back_anim = AnimatorInflater.loadAnimator(
+            applicationContext,
+            R.animator.back_animator
+        ) as AnimatorSet
 
         //Слушатель нажатия на полную картинку, когда рекуклер isGone
         binding.fullImageView.setOnClickListener {
             flip()
         }
+
+        binding.saveButton.setOnClickListener {
+            val img = binding.fullImageView.drawable
+            saveMediaToStorage(this, img)
+        }
     }
+
 
 
     @SuppressLint("NotifyDataSetChanged")
@@ -60,10 +88,14 @@ class MainActivity : AppCompatActivity() {
                 val rvAdapter = RVAdapter(data) //передаем в адаптер
                 rvAdapter.notifyDataSetChanged()
                 binding.rvList.adapter = rvAdapter
-
-
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        job.cancel()
+
     }
 
     fun fullSize(text: String, url: String) {
@@ -92,7 +124,7 @@ class MainActivity : AppCompatActivity() {
 
             handler.postDelayed({
                 binding.rvList.visibility = View.GONE
-            },1000)
+            }, 1000)
 
 
         } else {
@@ -103,7 +135,7 @@ class MainActivity : AppCompatActivity() {
             binding.cardView.visibility = View.VISIBLE
             isFront = true
             binding.rvList.visibility = View.VISIBLE
-            
+
             handler.postDelayed({
                 binding.cardView.visibility = View.GONE
             }, 1000)
