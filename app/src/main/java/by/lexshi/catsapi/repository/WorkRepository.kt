@@ -1,4 +1,4 @@
-package by.lexshi.catsapi
+package by.lexshi.catsapi.repository
 
 import androidx.paging.PagingData
 import by.lexshi.catsapi.model.ResponseItem

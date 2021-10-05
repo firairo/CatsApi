@@ -1,6 +1,5 @@
 package by.lexshi.catsapi.di
 
-import android.provider.SyncStateContract
 import by.lexshi.catsapi.network.Api
 import by.lexshi.catsapi.util.Constants
 import dagger.Module

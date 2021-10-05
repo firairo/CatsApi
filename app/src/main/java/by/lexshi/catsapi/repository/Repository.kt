@@ -1,8 +1,9 @@
-package by.lexshi.catsapi
+package by.lexshi.catsapi.repository
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import by.lexshi.catsapi.PagingSource
 import by.lexshi.catsapi.model.ResponseItem
 import by.lexshi.catsapi.network.Api
 import kotlinx.coroutines.flow.Flow
