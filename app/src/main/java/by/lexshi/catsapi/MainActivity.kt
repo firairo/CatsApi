@@ -2,36 +2,24 @@ package by.lexshi.catsapi
 
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
-import android.annotation.SuppressLint
-import android.content.ContentValues
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
-import android.net.Uri
-import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Environment
 import android.os.Handler
-import android.provider.MediaStore
 import android.view.View
-import android.widget.Toast
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toBitmap
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.lexshi.catsapi.databinding.ActivityMainBinding
-import by.lexshi.catsapi.network.RestClient
+import by.lexshi.catsapi.ui.WorksViewModel
 import by.lexshi.catsapi.util.saveMediaToStorage
 import com.bumptech.glide.Glide
-import kotlinx.coroutines.*
-import java.io.File
-import java.io.FileOutputStream
-import java.io.OutputStream
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
-@DelicateCoroutinesApi
+
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -39,7 +27,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var front_anim: AnimatorSet
     lateinit var back_anim: AnimatorSet
     var isFront = true
+    private val viewModel: WorksViewModel by viewModels()
 
+    private lateinit var recyclerViewAdapter: RVAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,10 +37,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        with(binding.rvList) {
-            layoutManager = LinearLayoutManager(this@MainActivity)
-        }
-        updateView()
+
+        setupRecyclerView()
+        loadData()
 
 
         val scale = applicationContext.resources.displayMetrics.density
@@ -78,19 +67,27 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    private fun setupRecyclerView() {
+        recyclerViewAdapter = RVAdapter()
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun updateView() {
-        job = GlobalScope.launch(Dispatchers.IO) {
-            val response = RestClient().service.getDataFromAPI()
-            val data = response.body()
-            withContext(Dispatchers.Main) {
-                val rvAdapter = RVAdapter(data) //передаем в адаптер
-                rvAdapter.notifyDataSetChanged()
-                binding.rvList.adapter = rvAdapter
+        binding.rvList.apply {
+            adapter = recyclerViewAdapter
+            layoutManager = LinearLayoutManager(this@MainActivity)
+
+        }
+
+    }
+
+
+
+    private fun loadData() {
+        lifecycleScope.launch {
+            viewModel.listData.collect {
+                recyclerViewAdapter.submitData(it)
             }
         }
     }
+
 
     override fun onDestroy() {
         super.onDestroy()

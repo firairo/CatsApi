@@ -4,14 +4,12 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import by.lexshi.catsapi.model.Response
 import by.lexshi.catsapi.model.ResponseItem
-import by.lexshi.catsapi.network.RestClient
+import by.lexshi.catsapi.network.Api
 import retrofit2.HttpException
 import kotlin.streams.toList
 
-class PagingSource(private val apiService: RestClient): PagingSource<Int,
-        ResponseItem>() {
+class PagingSource(private val apiService: Api): PagingSource<Int, ResponseItem>() {
 
     override fun getRefreshKey(state: PagingState<Int, ResponseItem>): Int? {
         val anchorPosition = state.anchorPosition ?: return null
@@ -24,8 +22,7 @@ class PagingSource(private val apiService: RestClient): PagingSource<Int,
             LoadResult<Int, ResponseItem> {
         return try{
             val pageNumber: Int = params.key ?: FIRST_PAGE_INDEX
-            //val pageSize = params.loadSize // в закомиченном коде не должно быть таких комментариев
-            val response = apiService.service.getDataFromAPI(limit = pageNumber)
+            val response = apiService.getDataFromAPI(page = pageNumber)
 
             if (response.isSuccessful) {
                 val data = checkNotNull(response.body())

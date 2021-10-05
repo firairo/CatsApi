@@ -1,5 +1,6 @@
 package by.lexshi.catsapi.network
 
+import by.lexshi.catsapi.util.Constants
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -9,7 +10,7 @@ import retrofit2.http.Query
 interface Api {
 
 
-    @GET("search")
+    @GET(Constants.END_POINT)
     suspend fun getDataFromAPI(
         @Query("api_key") api_key: String ="609b232f-0fc1-4bc4-839e-204848c256db",
         @Query("limit") limit: Int = 5,
