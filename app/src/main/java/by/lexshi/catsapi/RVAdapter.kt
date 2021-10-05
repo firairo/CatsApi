@@ -17,30 +17,36 @@ class RVAdapter : PagingDataAdapter<ResponseItem, RVAdapter.ViewHolder>(DiffUtil
 
     // Создает новый объект ViewHolder всякий раз, когда Recycler нуждается в этом
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RVAdapter.ViewHolder {
-        val inflater = LayoutInflater.from(parent.context).inflate(R.layout.item_rv, parent, false)
+        val binding = ItemRvBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
-        return ViewHolder(inflater)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: RVAdapter.ViewHolder, position: Int) {
         holder.bind(getItem(position)!!)
-        /*val url = data?.get(position)?.url.toString()
-        val text = data?.get(position)?.id.toString()
+
+        var data = holder.getData()
 
         holder.itemView.setOnClickListener {
-            (holder.itemView.context as MainActivity).fullSize(text, url)
+            (holder.itemView.context as MainActivity).fullSize(data[0], data[1])
 
             //Toast.makeText(holder.itemView.context, url, Toast.LENGTH_SHORT).show()
 
-        }*/
+        }
     }
 
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        var imgView: ImageView = view.findViewById(R.id.image_view)
+    class ViewHolder(binding: ItemRvBinding) : RecyclerView.ViewHolder(binding.root) {
+        var imgView: ImageView = binding.imageView
+
+        private lateinit var text: String
+        private lateinit var url: String
 
 
         fun bind(data: ResponseItem) {
+            url = data?.url.toString()
+            text = data?.id.toString()
+
             Glide
                 .with(itemView.context)
                 .load(data.url)
@@ -49,6 +55,10 @@ class RVAdapter : PagingDataAdapter<ResponseItem, RVAdapter.ViewHolder>(DiffUtil
                 .into(imgView)
 
 
+        }
+
+        fun getData(): List<String> {
+            return listOf<String>(text,url)
         }
     }
 }
